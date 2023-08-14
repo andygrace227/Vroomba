@@ -22,12 +22,9 @@ class RobotObstacleSource(ObstacleSource):
                 angle = ((60 - (20 * i)) * math.pi)/180
                 obstacleList.append([self.LIGHT_RADIUS * math.cos(angle),
                                      self.LIGHT_RADIUS * math.sin(angle)])
-                
-                robot.beep(i + 50, 10)
 
         if bumper_info[0] == 1 and bumper_info[1] == 1:
             obstacleList.append([self.ROOMBA_RADIUS, 0])
-            robot.beep(31, 20)
         
         elif bumper_info[0] == 1:
             obstacleList.append([0,self.ROOMBA_RADIUS])

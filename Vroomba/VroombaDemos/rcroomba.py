@@ -1,9 +1,7 @@
 
 import math
 import pygame
-from PyRoombaAdapter import PyRoombaAdapter
-from Roomba import Roomba
-from RobotObstacleSource import RobotObstacleSource
+from VroombaInterface import PyRoombaAdapter, Roomba, RobotObstacleSource
 
 DAMPENING_FACTOR = 0.5
 DEADZONE = 0.15
@@ -91,6 +89,9 @@ def main():
         for event in pygame.event.get():
             keepGoing = processVideoGameControllerLogic(roomba, event)
         
+        if len(roomba.obstacleInformation) != 0:
+            roomba.beep(65,5)
+
         roomba._updateRoombaDriveState()
         roomba.calculateObstacles()
         clock.tick(60)
