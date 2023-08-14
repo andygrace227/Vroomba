@@ -74,6 +74,8 @@ class PyRoombaAdapter:
         # "Name", (Packet ID, Data Bytes, signed)
         "Bump Sensor" : (7,1,False),
         "Buttons" : (18,1,False),
+        "Distance" : (19, 2, True),
+        "Angle" : (20,2,True),
         "Charging State": (21, 1, False),
         "Voltage": (22, 2, False),
         "Current": (23, 2, True),
@@ -607,6 +609,27 @@ class PyRoombaAdapter:
         :return: State 0-5
         """
         return self._request_sensor("Charging State")
+
+    def request_distance(self):
+        """
+        Requests the distance traveled since this was last called.
+
+        Returns the number of mm travelled, either forward or backwards
+
+        """
+
+        return self._request_sensor("Distance")
+
+    def request_angle(self):
+        """
+        Requests the angle turned since this was last called.
+
+        Returns the number of mm travelled, either forward or backwards
+
+        """
+
+        return self._request_sensor("Angle")
+
 
     def request_voltage(self):
         """
