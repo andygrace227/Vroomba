@@ -1,4 +1,4 @@
-import Roomba
+from VroombaInterface.Roomba import Roomba
 from abc import ABC, abstractmethod
 
 class ObstacleSource(ABC):

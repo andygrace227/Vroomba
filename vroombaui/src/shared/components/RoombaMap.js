@@ -17,8 +17,6 @@ function RoombaMap(props) {
     setMouseInfo((prev)=>{
         if (prev["drag"] == true) {
             setViewport((arr) => {
-                console.log((prev.x - e.clientX)/250, (prev.y - e.clientY)/250);
-
                 return [prev.origViewX - (( e.clientX - prev.x) / arr[2]), prev.origViewY - ((prev.y - e.clientY) / arr[2]), arr[2]]});
         }
         return prev;
@@ -34,7 +32,6 @@ function RoombaMap(props) {
       newState.y = e.clientY;
       newState.origViewX = viewport[0];
       newState.origViewY = viewport[1];
-      console.log(e.x, e.y);
       return newState;
     });
   };

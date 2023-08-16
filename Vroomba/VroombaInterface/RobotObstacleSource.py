@@ -1,5 +1,5 @@
-from IObstacleSource import ObstacleSource
-import Roomba
+from VroombaInterface.IObstacleSource import ObstacleSource
+from VroombaInterface.Roomba import Roomba
 import math
 
 class RobotObstacleSource(ObstacleSource):

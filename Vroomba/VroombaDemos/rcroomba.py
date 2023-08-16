@@ -79,7 +79,7 @@ def main():
 
     # Set up the roomba
     PORT = "/dev/tty.usbserial-B0010JYM"
-    adapter = PyRoombaAdapter(PORT)
+    adapter = PyRoombaAdapter.PyRoombaAdapter(PORT)
     adapter.change_mode_to_full()
  
     roomba = Roomba(adapter)

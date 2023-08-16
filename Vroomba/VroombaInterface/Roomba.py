@@ -1,4 +1,4 @@
-from PyRoombaAdapter import PyRoombaAdapter
+from VroombaInterface.PyRoombaAdapter import PyRoombaAdapter
 import math
 
 class Roomba:
@@ -114,7 +114,7 @@ class Roomba:
         else:
             self._updateRoombaRegularDriveState()
 
-    def normal_drive(self, velocity, rotation):
+    def normalDrive(self, velocity, rotation):
         """
         Drive with velocity and yaw
 
