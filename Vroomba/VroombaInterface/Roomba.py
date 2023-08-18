@@ -55,7 +55,7 @@ class Roomba:
                 radius = velocity / self.driveInfo[1]
             
             # Now we have the radius of the circle. So we get the distance of the robot
-            distanceAlongArc = self._getDistanceMovedSinceLastSent()
+            distanceAlongArc = self._getDistanceMovedSinceLastSent() / 1000
 
             if radius != 0:
                 

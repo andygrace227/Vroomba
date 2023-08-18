@@ -1,11 +1,11 @@
 import { useEffect, useState, useRef } from "react";
-
+import Config from "../../Config";
 function RoombaMap(props) {
   // x in meters,y in meters,heading in radians
 
   var roombaPosition = [props.x, props.y, props.heading];
   // center x in meters, center y in meters, scale in pixels per meter
-  const [viewport, setViewport] = useState([1, 0, 250]);
+  const [viewport, setViewport] = useState([0, 0, 50]);
   const [mouseInfo, setMouseInfo] = useState({ drag: false, x: 0, y: 0, origViewX: 0, origViewY:0});
   const canvasRef = useRef(null);
 

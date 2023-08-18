@@ -11,15 +11,15 @@ function App() {
   }
 
   const sendMoveCommand = () => {
-    var velocity = 0
-    var angle = 0
-    console.log("sendMoveCommand")
-
-    for(var s in keysPressed.current){
+    var velocity = 0;
+    var angle = 0;
+    console.log(keysPressed.current)
+      
+    for(var s of keysPressed.current){
       if(s == "a") angle += 1;
       if(s == "d") angle -= 1;
-      if(s == "w") velocity += 0.25
-      if(s == "s") velocity -= 0.25
+      if(s == "w") velocity += 0.25;
+      if(s == "s") velocity -= 0.25;
     }
     fetch(Config.SERVER_IP + "/drive?velocity=" + velocity + "&angle=" + angle)
   }
@@ -31,9 +31,11 @@ function App() {
     }
     else{
       var kp = keysPressed.current;
-      kp.push(e.key);
-      keysPressed.current = kp;
-      sendMoveCommand()
+      if (kp.includes(e.key) == false){
+        kp.push(e.key);
+        keysPressed.current = kp;
+        sendMoveCommand()
+      }
     }
   }
 
@@ -47,10 +49,6 @@ function App() {
 
   window.addEventListener("keydown", registerKeyPress)
   window.addEventListener("keyup", unregisterKeyPress)
-
-
-
-
 
   return (
       

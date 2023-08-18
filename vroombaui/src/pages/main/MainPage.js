@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import RoombaMap from "../../shared/components/RoombaMap";
-
+import Config from "../../Config";
 function usePrevious(value) {
     const ref = useRef();
     useEffect(() => {
@@ -14,11 +14,23 @@ function MainPage() {
 
     const [roombaPosition, setRoombaPosition] = useState([0,0,0]);
 
-    useEffect(() => {
+
+    const getRoombaPositionFromAPI = async () => {
+      var coords = []
+      var response = await fetch(Config.SERVER_IP + "/getPosition")
+        .then(response => response.json())
+        .catch(error =>  {return {x:0,y:0,heading:0};});
+      coords[0] = response.x;
+      coords[1] = response.y;
+      coords[2] = response.heading;
+      setRoombaPosition(e => coords);
+    }
+
+    useEffect( () => {
         const interval = setInterval(() => {
-            setRoombaPosition(arr => [arr[0],arr[1], arr[2] + (Math.PI / 180)]);
-            setRoombaPosition(arr => [Math.cos(arr[2]) + 1,Math.sin(arr[2]), arr[2]])
-        }, 16);
+            getRoombaPositionFromAPI();
+            
+        }, 1000);
 
 
         return () => clearInterval(interval);
