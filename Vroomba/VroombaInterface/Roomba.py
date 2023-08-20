@@ -1,5 +1,17 @@
 from VroombaInterface.PyRoombaAdapter import PyRoombaAdapter
 import math
+import inspect
+
+
+"""
+An annotation to make exposing APIs easier
+"""
+def exposeAPI(func):
+    func._isExposedAPI = True
+    func._signature = inspect.signature(func)
+    return func
+
+
 
 class Roomba:
     """
@@ -24,6 +36,51 @@ class Roomba:
         self.obstacleSources = []
         self.obstacleInformation = []
         self.tankMode = False
+        self.exposedAPIs = {}
+        self._registerExposedAPIs()
+
+    def _registerExposedAPIs(self):
+        for i in dir(self.__class__):
+            if hasattr(getattr(self, i), "_isExposedAPI"):
+                methodDict = {}
+                methodDict["name"] = i
+                methodDict["signature"] = getattr(getattr(self, i),"_signature")
+                methodDict["method"] = getattr(self, i) 
+                self.exposedAPIs[i]=(methodDict)
+
+        
+    @exposeAPI
+    def getHeading(self):
+        return self.heading
+
+    @exposeAPI
+    def getPosition(self):
+        return [self.relPosition[0], self.relPosition[1], self.heading]
+
+    @exposeAPI
+    def getObstacleInformation(self):
+        return self.obstacleInformation
+    
+    @exposeAPI
+    def activateFullMode(self):
+        self.adapter.change_mode_to_full()
+        return True
+    
+    @exposeAPI
+    def shutdown(self):
+        self.adapter.turn_off_power()
+        return True
+    
+    @exposeAPI
+    def activatePassiveMode(self):
+        self.adapter.change_mode_to_passive()
+        return True
+
+    @exposeAPI
+    def activateSafeMode(self):
+        self.adapter.change_mode_to_safe()
+        return True
+    
 
     def _updateRoombaFanState(self):
         """
@@ -114,7 +171,8 @@ class Roomba:
         else:
             self._updateRoombaRegularDriveState()
 
-    def normalDrive(self, velocity, rotation):
+    @exposeAPI
+    def normalDrive(self, velocity : float, rotation : float):
         """
         Drive with velocity and yaw
 
@@ -127,50 +185,62 @@ class Roomba:
         self.driveInfo = [velocity, rotation]
         self._updateRoombaDriveState()
 
+    @exposeAPI
     def tank_drive(self, left, right):
         self.tankMode = True
         self.driveInfo = [left, right]
         self._updateRoombaDriveState()
 
+    @exposeAPI
     def activateFan(self):
         self.vacuumState["fan"] = True
         self._updateRoombaFanState()
 
+    @exposeAPI
     def deactivateFan(self):
         self.vacuumState["fan"] = False
         self._updateRoombaFanState()
 
+    @exposeAPI
     def activateRoller(self):
         self.vacuumState["roller"] = True
         self._updateRoombaFanState()
 
+    @exposeAPI
     def deactivateRoller(self):
         self.vacuumState["roller"] = False
         self._updateRoombaFanState()
 
+    @exposeAPI
     def activateSide(self):
         self.vacuumState["side"] = True
         self._updateRoombaFanState()
 
+    @exposeAPI
     def deactivateSide(self):
         self.vacuumState["side"] = False
         self._updateRoombaFanState()
     
+    @exposeAPI
     def addObstacleSource(self, obstacleSource):
         self.obstacleSources.append(obstacleSource)
 
+    @exposeAPI
     def calculateObstacles(self):
         self.obstacleInformation = []
         for i in range(0, len(self.obstacleSources)):
             self.obstacleInformation.append(self.obstacleSources[i].calculate(self))
 
-    def beep(self, note, duration):
+    @exposeAPI
+    def beep(self, note : int, duration : int):
         self.adapter.send_song_cmd(0, 1, [note], [duration])
         self.adapter.send_play_cmd(0)
 
+    @exposeAPI
     def getRobotBumpAndWheelSensors(self) -> list[int]:
         return self.adapter.request_bump_and_wheels()
     
+    @exposeAPI
     def getRobotProximitySensorsSummary(self) -> list[int]:
         return self.adapter.request_light_bumper_summary()
     

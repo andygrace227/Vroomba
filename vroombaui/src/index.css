@@ -4,3 +4,11 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+.home-container{
+  min-height: 100vh;
+  background-image: url("./images/vroomba-emboss.svg");
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-size: contain;
+  background-position: 100% 100%;
+}

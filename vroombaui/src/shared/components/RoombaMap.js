@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import Config from "../../Config";
+
 function RoombaMap(props) {
   // x in meters,y in meters,heading in radians
 
@@ -11,6 +12,7 @@ function RoombaMap(props) {
 
   const changeZoom = (e) => {
     setViewport((arr) => [arr[0], arr[1], Math.min(Math.max(arr[2] - e.deltaY * 0.05, 40), 500)]);
+    draw();
   };
 
   const changePosition = (e) => {
@@ -21,6 +23,7 @@ function RoombaMap(props) {
         }
         return prev;
     })
+    draw();
     
   };
 
@@ -34,6 +37,7 @@ function RoombaMap(props) {
       newState.origViewY = viewport[1];
       return newState;
     });
+    draw();
   };
 
   const endDrag = (e) => {
@@ -44,6 +48,7 @@ function RoombaMap(props) {
     newState.y = e.clientY;
     return newState;
     });
+    draw();
   };
 
   var canvas = (
@@ -58,14 +63,19 @@ function RoombaMap(props) {
     ></canvas>
   );
 
-  useEffect(() => {
+  const draw = () => {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
     const screen = [canvas.width, canvas.height];
-
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     renderRoomba(ctx, roombaPosition, viewport, screen);
     renderGrid(ctx, viewport, screen);
+  }
+
+  useEffect(() => {
+   
+    draw();
+   
   }, [props.x, props.y, props.heading]);
 
   return canvas;
@@ -84,7 +94,7 @@ function scaleNumber(num, viewport) {
 function renderRoomba(ctx, position, viewport, screen) {
   ctx.lineCap = "round";
   ctx.beginPath();
-  var heading = Math.PI / 2 + position[2];
+  var heading = position[2];
   var sscoords = translateCoords([position[0], position[1]], viewport, screen);
   var hscoords = translateCoords(
     [position[0] + 0.34 * Math.cos(heading), position[1] + 0.34 * Math.sin(heading)],
