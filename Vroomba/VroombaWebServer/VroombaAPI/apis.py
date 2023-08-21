@@ -8,6 +8,31 @@ from VroombaAPI import app
 from VroombaInterface import RoombaMode
 
 
+
+@app.route('/listapi')
+def listAllAPIs():
+    try:
+        robot = app.config["ROOMBA"]
+        str = "";
+        for exposedApi in robot.exposedAPIs:
+            name = exposedApi.name
+            parameters = [key for key in exposedApi["signature"].parameters]
+            parameters.pop(0)
+
+
+            str += '{} '.format(name)
+            parameterStr = ''
+            for i in parameters:
+                parameterStr += '{}, '.format(i)
+            str += '({})\n'.format(parameterStr)
+        
+        return jsonify(str)
+    
+    except Exception as e:
+        return jsonify("Invalid Request: " + repr(e))
+
+
+
 @app.route('/api', defaults={'path': ''})
 @app.route('/api/<path:path>',  methods=['GET', 'POST'])
 def accessAPI(path):
