@@ -69,6 +69,7 @@ class Roomba:
     @exposeAPI
     def resetPosition(self):
         self.relPosition = [0,0]
+        self.heading = 0
     
     @exposeAPI
     def shutdown(self):

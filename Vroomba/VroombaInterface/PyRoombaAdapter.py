@@ -63,7 +63,7 @@ class PyRoombaAdapter:
     }
 
     PARAMS = {
-        "STRAIGHT_RADIUS": 32768,
+        "STRAIGHT_RADIUS": 32767,
         "MIN_RADIUS": -2000,
         "MAX_RADIUS": 2000,
         "MIN_VELOCITY": -500,

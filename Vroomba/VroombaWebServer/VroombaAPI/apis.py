@@ -14,12 +14,10 @@ def listAllAPIs():
     try:
         robot = app.config["ROOMBA"]
         str = "";
-        for exposedApi in robot.exposedAPIs:
-            name = exposedApi.name
+        for name, exposedApi in robot.exposedAPIs:
+            
             parameters = [key for key in exposedApi["signature"].parameters]
             parameters.pop(0)
-
-
             str += '{} '.format(name)
             parameterStr = ''
             for i in parameters:
