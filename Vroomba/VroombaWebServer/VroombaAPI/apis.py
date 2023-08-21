@@ -19,10 +19,13 @@ def listAllAPIs():
             parameters = [key for key in exposedApi["signature"].parameters]
             parameters.pop(0)
             str += '{} '.format(name)
+            print("hello")
             parameterStr = ''
             for i in parameters:
                 parameterStr += '{}, '.format(i)
+                print("hey")
             str += '({})\n'.format(parameterStr)
+            print("hiho")
         
         return jsonify(str)
     
