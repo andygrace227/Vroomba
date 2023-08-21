@@ -15,17 +15,15 @@ def listAllAPIs():
         robot = app.config["ROOMBA"]
         str = "";
         for api in robot.exposedAPIs:
-            print(api)
             parameters = [key for key in robot.exposedAPIs[api]["signature"].parameters]
             parameters.pop(0)
             str += '{} '.format(robot.exposedAPIs[api]['name'])
-            print("hello")
             parameterStr = ''
-            for i in parameters:
-                parameterStr += '{}, '.format(i)
-                print("hey")
-            str += '({})\n'.format(parameterStr)
-            print("hiho")
+            for i in range(0, len(parameters)):
+                parameterStr += '{}'.format(i)
+                if (i == len(parameters) - 1) == False:
+                    parameterStr += ", "
+            str += "({}) \n".format(parameterStr)
         
         return jsonify(str)
     
