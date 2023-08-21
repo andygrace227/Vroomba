@@ -67,6 +67,10 @@ class Roomba:
         return True
     
     @exposeAPI
+    def resetPosition(self):
+        self.relPosition = [0,0]
+    
+    @exposeAPI
     def shutdown(self):
         self.adapter.turn_off_power()
         return True
