@@ -7,8 +7,6 @@ from flask import request
 from VroombaAPI import app
 from VroombaInterface import RoombaMode
 
-
-
 @app.route('/listapi')
 def listAllAPIs():
     try:
@@ -20,7 +18,7 @@ def listAllAPIs():
             str += '{} '.format(robot.exposedAPIs[api]['name'])
             parameterStr = ''
             for i in range(0, len(parameters)):
-                parameterStr += '{}'.format(i)
+                parameterStr += '{}'.format(parameters[i])
                 if (i == len(parameters) - 1) == False:
                     parameterStr += ", "
             str += "({}) \n".format(parameterStr)

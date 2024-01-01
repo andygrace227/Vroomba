@@ -41,18 +41,16 @@ function Status(props) {
     return (
         <>
         <Row>
-            <Col className="text-center display-6" sm="12">
+            <Col className="text-center display-6 fw-bold" sm="12">
                 {welcomeString}
             </Col>
+            <Col className="text-center" sm="12">
+                Your Roomba is online.
+            </Col>
         </Row>
-        
         </>
     )
     
-    
-
-
-
 
 }
 

@@ -3,28 +3,42 @@ import Config from "../../Config";
 
 function RoombaMap(props) {
   // x in meters,y in meters,heading in radians
-
+  
   var roombaPosition = [props.x, props.y, props.heading];
-  // center x in meters, center y in meters, scale in pixels per meter
-  const [viewport, setViewport] = useState([0, 0, 50]);
-  const [mouseInfo, setMouseInfo] = useState({ drag: false, x: 0, y: 0, origViewX: 0, origViewY:0});
+  // center x in meters, center y in meters, scale in pixels per meter, dpi factor
+  const [viewport, setViewport] = useState([0, 0, 100, 2]);
+  const [mouseInfo, setMouseInfo] = useState({ drag: false, x: 0, y: 0, origViewX: 0, origViewY: 0 });
   const canvasRef = useRef(null);
 
+  let initArr = [200, 200];
+
+  if (props.height && props.width) {
+    initArr = [props.height, props.width];
+  }
+
+  const size = useRef(initArr);
+
   const changeZoom = (e) => {
-    setViewport((arr) => [arr[0], arr[1], Math.min(Math.max(arr[2] - e.deltaY * 0.05, 40), 500)]);
+    e.preventDefault();
+    setViewport((arr) => [arr[0], arr[1],  Math.min(Math.max(arr[2] - e.deltaY * 0.05, 40), 500), arr[3]]);
     draw();
   };
 
   const changePosition = (e) => {
-    setMouseInfo((prev)=>{
-        if (prev["drag"] == true) {
-            setViewport((arr) => {
-                return [prev.origViewX - (( e.clientX - prev.x) / arr[2]), prev.origViewY - ((prev.y - e.clientY) / arr[2]), arr[2]]});
-        }
-        return prev;
-    })
+    setMouseInfo((prev) => {
+      if (prev["drag"] == true) {
+        setViewport((arr) => {
+          return [
+            arr[3] * (prev.origViewX - (e.clientX - prev.x) / arr[2]),
+            arr[3] * (prev.origViewY - (prev.y - e.clientY) / arr[2]),
+            arr[2],
+            arr[3]
+          ];
+        });
+      }
+      return prev;
+    });
     draw();
-    
   };
 
   const startDrag = (e) => {
@@ -42,11 +56,11 @@ function RoombaMap(props) {
 
   const endDrag = (e) => {
     setMouseInfo((prevState) => {
-    let newState = { ...prevState };
-    newState.drag = false;
-    newState.x = e.clientX;
-    newState.y = e.clientY;
-    return newState;
+      let newState = { ...prevState };
+      newState.drag = false;
+      newState.x = e.clientX;
+      newState.y = e.clientY;
+      return newState;
     });
     draw();
   };
@@ -54,28 +68,42 @@ function RoombaMap(props) {
   var canvas = (
     <canvas
       ref={canvasRef}
-      width={props.width}
-      height={props.height}
-      onWheel={changeZoom}
+      width={size.current[1]}
+      height={size.current[0]}
       onMouseDown={startDrag}
       onMouseUp={endDrag}
       onMouseMove={changePosition}
     ></canvas>
   );
 
+
   const draw = () => {
     const canvas = canvasRef.current;
+    if (props.autoFit) {
+      canvas.style.width = "100%";
+      canvas.style.height = "100%";
+      canvas.width = 2 * canvas.offsetWidth;
+      canvas.height = 2 * canvas.offsetHeight;
+    }
     const ctx = canvas.getContext("2d");
     const screen = [canvas.width, canvas.height];
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     renderRoomba(ctx, roombaPosition, viewport, screen);
     renderGrid(ctx, viewport, screen);
-  }
+  };
+
 
   useEffect(() => {
-   
+    let canvas = canvasRef.current;
+    canvas.addEventListener("wheel", changeZoom, {passive:false}) 
+    return () => {
+      canvas.removeEventListener('wheel', changeZoom);
+    }
+   }, [viewport])
+
+  useEffect(() => {
+
     draw();
-   
   }, [props.x, props.y, props.heading]);
 
   return canvas;
@@ -87,9 +115,16 @@ function translateCoords(coords, viewport, screen) {
   return [viewport_translation[0] + screen[0] / 2, -1.0 * viewport_translation[1] + screen[1] / 2];
 }
 
-function scaleNumber(num, viewport) {
-  return viewport[2] * num;
+function pixelToRealSpace(pixel, viewport, screen) {
+  // Screen to unit :/ 
+
+  let xPosition = (((2 * pixel[0]) - screen[0]) / viewport[2]) + viewport[0]
+  let yPosition = ((-1.0 * ((2 * pixel[1]) - screen[1])) /  viewport[2]) + viewport[1]
+
+
+  return [xPosition, yPosition];
 }
+
 
 function renderRoomba(ctx, position, viewport, screen) {
   ctx.lineCap = "round";
@@ -121,18 +156,31 @@ function renderRoomba(ctx, position, viewport, screen) {
 }
 
 function renderGrid(ctx, viewport, screen) {
+  // Figure out which meters are on the screen.
+  let topLeft = pixelToRealSpace([0,0], viewport, screen);
+  let bottomRight = pixelToRealSpace(screen, viewport, screen);
+
+
+  let horizontalStart = Math.floor(topLeft[0] - 1);
+  let horizontalEnd = Math.ceil(bottomRight[0] + 1);
+
+  let verticalStart = Math.floor(topLeft[1] + 1);
+  let verticalEnd = Math.ceil(bottomRight[1] - 1);
+
+  console.log("Verts:" + verticalStart + " " + verticalEnd);
+
   ctx.lineWidth = 0.5;
 
-  for (var i = -10; i < 10; i++) {
+  for (let i = horizontalStart; i < horizontalEnd; i++) {
     ctx.beginPath();
-    ctx.moveTo(...translateCoords([i, -10], viewport, screen));
-    ctx.lineTo(...translateCoords([i, 10], viewport, screen));
+    ctx.moveTo(...translateCoords([i, verticalStart ], viewport, screen));
+    ctx.lineTo(...translateCoords([i, verticalEnd], viewport, screen));
     ctx.stroke();
   }
-  for (var j = -10; j < 10; j++) {
+  for (let j = verticalStart; j > verticalEnd; j--) {
     ctx.beginPath();
-    ctx.moveTo(...translateCoords([-10, j], viewport, screen));
-    ctx.lineTo(...translateCoords([10, j], viewport, screen));
+    ctx.moveTo(...translateCoords([horizontalStart, j], viewport, screen));
+    ctx.lineTo(...translateCoords([horizontalEnd, j], viewport, screen));
     ctx.stroke();
   }
 }
